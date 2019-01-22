@@ -8,8 +8,13 @@ package bashscriptbuilder;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -68,11 +73,22 @@ public class BashScriptBuilder {
     
     private static void createBashScript(String filename) throws IOException {
         File file = new File(filename);
+        
         FileWriter writer = new FileWriter(file);
         writer.write("#! /bin/bash\n");
         for(String strCmd : lstCmds) {
             writer.write(strCmd + "\n");
         }        
         writer.close();
+        
+        Set<PosixFilePermission> perms = new HashSet<>();
+        perms.add(PosixFilePermission.OWNER_READ);
+        perms.add(PosixFilePermission.OWNER_WRITE);
+        perms.add(PosixFilePermission.OWNER_EXECUTE);
+        perms.add(PosixFilePermission.GROUP_READ);
+        perms.add(PosixFilePermission.GROUP_EXECUTE);
+        perms.add(PosixFilePermission.OTHERS_READ);
+        perms.add(PosixFilePermission.OTHERS_EXECUTE);
+        Files.setPosixFilePermissions(Paths.get(file.getPath()), perms);
     }
 }
