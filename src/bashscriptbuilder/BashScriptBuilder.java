@@ -5,6 +5,9 @@
  */
 package bashscriptbuilder;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.context.ApplicationContext;
@@ -19,7 +22,7 @@ public class BashScriptBuilder {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         ApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
                
         Command cmdPwd = context.getBean(Pwd.class);    
@@ -53,6 +56,7 @@ public class BashScriptBuilder {
         lstCmds.add(cmdCat.getCmd());
 
         printScript();
+        createBashScript("commands.sh");
     }  
     
     private static void printScript() {
@@ -60,5 +64,15 @@ public class BashScriptBuilder {
         for(String strCmd : lstCmds) {
             System.out.println(strCmd);
         }
+    }
+    
+    private static void createBashScript(String filename) throws IOException {
+        File file = new File(filename);
+        FileWriter writer = new FileWriter(file);
+        writer.write("#! /bin/bash\n");
+        for(String strCmd : lstCmds) {
+            writer.write(strCmd + "\n");
+        }        
+        writer.close();
     }
 }
